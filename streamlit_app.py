@@ -167,50 +167,120 @@ def compute_vendor_risk(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def local_ai_assistant(question: str, df: pd.DataFrame) -> str:
-    q = question.lower()
+    q = question.lower().strip()
 
-    if "riskiest vendor" in q or "vendor is riskiest" in q:
-        vendor_risk = compute_vendor_risk(df)
-        if vendor_risk.empty:
-            return "No vendor data is available."
+    if df.empty:
+        return "No data is available in the current filter."
+
+    priority_df = df.sort_values(
+        by=["COMBINED_SCORE", "EXTRACTED_AMOUNT"],
+        ascending=[False, False]
+    )
+
+    vendor_risk = compute_vendor_risk(df)
+
+    # riskiest vendor
+    if (
+        "riskiest vendor" in q
+        or "risky vendor" in q
+        or "highest risk vendor" in q
+        or "which vendor is risky" in q
+        or "which vendor is riskiest" in q
+    ):
         top = vendor_risk.iloc[0]
         return (
             f"The riskiest vendor is {top['EXTRACTED_VENDOR_NAME']} "
-            f"with a vendor risk score of {top['VENDOR_RISK_SCORE']}."
+            f"with a vendor risk score of {top['VENDOR_RISK_SCORE']} "
+            f"and risk tier {top['RISK_TIER']}."
         )
 
-    if "how many duplicate" in q:
-        count = int((df["FINAL_FLAG"] == "DUPLICATE_INVOICE").sum())
-        return f"There are {count} duplicate invoice cases in the current filtered dataset."
-
-    if "how many overbilling" in q or "overbilling" in q:
-        count = int((df["FINAL_FLAG"] == "OVERBILLING_RISK").sum())
-        return f"There are {count} overbilling risk cases in the current filtered dataset."
-
-    if "review first" in q or "what should finance review first" in q:
-        priority_df = df.sort_values(by=["COMBINED_SCORE", "EXTRACTED_AMOUNT"], ascending=[False, False])
-        if priority_df.empty:
-            return "There are no cases available to review."
+    # riskiest invoice / case
+    if (
+        "riskiest invoice" in q
+        or "most risk invoice" in q
+        or "most risky invoice" in q
+        or "highest risk invoice" in q
+        or "which invoice is risky" in q
+        or "which is most risk invoice" in q
+    ):
         top = priority_df.iloc[0]
         return (
-            f"Finance should review {top['FILE_NAME']} first. "
-            f"It is flagged as {top['FINAL_FLAG']} with AI prediction {top['AI_RISK_PREDICTION_LABEL']} "
+            f"The riskiest invoice is {top['FILE_NAME']} "
+            f"from {top['EXTRACTED_VENDOR_NAME']} "
+            f"with rule flag {top['FINAL_FLAG']}, "
+            f"AI prediction {top['AI_RISK_PREDICTION_LABEL']}, "
             f"and recommended action: {top['RECOMMENDED_ACTION']}."
         )
 
-    if "high-risk" in q and "ok by rules" in q:
+    # duplicates
+    if "duplicate" in q:
+        count = int((df["FINAL_FLAG"] == "DUPLICATE_INVOICE").sum())
+        if count == 0:
+            return "There are no duplicate invoice cases in the current filtered dataset."
+        duplicate_files = df[df["FINAL_FLAG"] == "DUPLICATE_INVOICE"]["FILE_NAME"].astype(str).tolist()
+        return (
+            f"There are {count} duplicate invoice cases. "
+            f"Examples: {', '.join(duplicate_files[:5])}."
+        )
+
+    # overbilling
+    if "overbilling" in q or "amount mismatch" in q:
+        count = int((df["FINAL_FLAG"] == "OVERBILLING_RISK").sum())
+        if count == 0:
+            return "There are no overbilling risk cases in the current filtered dataset."
+        files = df[df["FINAL_FLAG"] == "OVERBILLING_RISK"]["FILE_NAME"].astype(str).tolist()
+        return (
+            f"There are {count} overbilling risk cases. "
+            f"Examples: {', '.join(files[:5])}."
+        )
+
+    # finance review first
+    if (
+        "review first" in q
+        or "what should finance review first" in q
+        or "which case first" in q
+        or "priority case" in q
+    ):
+        top = priority_df.iloc[0]
+        return (
+            f"Finance should review {top['FILE_NAME']} first. "
+            f"It belongs to {top['EXTRACTED_VENDOR_NAME']}, "
+            f"has rule flag {top['FINAL_FLAG']}, "
+            f"AI prediction {top['AI_RISK_PREDICTION_LABEL']}, "
+            f"and recommended action: {top['RECOMMENDED_ACTION']}."
+        )
+
+    # AI high risk but rules OK
+    if (
+        ("high-risk" in q or "high risk" in q)
+        and ("ok by rules" in q or "marked ok" in q or "rules say ok" in q)
+    ):
         subset = df[
-            (df["AI_RISK_PREDICTION_LABEL"] == "HIGH_RISK") &
-            (df["FINAL_FLAG"] == "OK")
+            (df["AI_RISK_PREDICTION_LABEL"] == "HIGH_RISK")
+            & (df["FINAL_FLAG"] == "OK")
         ]
         if subset.empty:
             return "There are no AI high-risk cases currently marked OK by rules."
         files = ", ".join(subset["FILE_NAME"].astype(str).tolist()[:5])
-        return f"The following AI high-risk cases are still marked OK by rules: {files}."
+        return f"The AI high-risk cases still marked OK by rules are: {files}."
+
+    # vendor count / summary
+    if "vendor" in q and ("summary" in q or "score" in q or "risk" in q):
+        top_rows = vendor_risk.head(3)
+        summary = []
+        for _, row in top_rows.iterrows():
+            summary.append(
+                f"{row['EXTRACTED_VENDOR_NAME']} ({row['VENDOR_RISK_SCORE']}, {row['RISK_TIER']})"
+            )
+        return "Top vendor risk scores: " + ", ".join(summary) + "."
 
     return (
-        "I can answer questions about risky vendors, duplicate invoices, overbilling cases, "
-        "top priority reviews, and rule-versus-AI disagreements."
+        "Try asking things like: "
+        "'Which vendor is riskiest?', "
+        "'Which is the riskiest invoice?', "
+        "'How many duplicate invoices do we have?', "
+        "'How many overbilling cases are there?', "
+        "or 'What should finance review first?'"
     )
 
 
