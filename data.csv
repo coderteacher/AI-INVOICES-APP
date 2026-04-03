@@ -1,0 +1,66 @@
+FILE_NAME,EXTRACTED_VENDOR_NAME,EXTRACTED_INVOICE_NUMBER,EXTRACTED_PO_ID,EXTRACTED_AMOUNT,MATCH_STATUS,FINAL_FLAG,AI_RISK_PREDICTION,AI_EXPLANATION
+I001,Acme Supplies,INV-9001,PO1001,15000.00,MATCH,OK,"{
+  ""labels"": [
+    ""LOW_RISK""
+  ]
+}",""" The invoice is safe as it has a match status of \""MATCH,\"" indicating that the purchase order, invoice number, and vendor information align, and the final flag is marked as \""OK.\"""""
+I002,Acme Supplies,INV-9001,PO1001,15000.00,MATCH,DUPLICATE_INVOICE,"{
+  ""labels"": [
+    ""HIGH_RISK""
+  ]
+}",""" The invoice is risky because it has a \""DUPLICATE_INVOICE\"" final flag, indicating it is a duplicate of a previously processed invoice, which may lead to overpayment or fraudulent activities."""
+I003,Global Parts Ltd,INV-4402,PO1002,24500.00,AMOUNT_MISMATCH,OVERBILLING_RISK,"{
+  ""labels"": [
+    ""HIGH_RISK""
+  ]
+}",""" The invoice from Global Parts Ltd. (INV-4402) with a PO ID of PO1002 and an amount of 24500.00 is considered risky due to an AMOUNT_MISMATCH and an OVERBILLING_RISK flag, indicating potential procurement fraud."""
+I004,Northwind Industrial,INV-7788,PO1003,9500.00,MATCH,OK,"{
+  ""labels"": [
+    ""LOW_RISK""
+  ]
+}",""" The invoice from Northwind Industrial (INV-7788) with a PO ID of PO1003, an amount of 9500.00, and a match status of MATCH and final flag of OK appears to be safe, as it has a match status indicating it aligns with the purchase order and has been approved."""
+I005,BluePeak Office Co,INV-8101,PO1004,3200.00,MATCH,OK,"{
+  ""labels"": [
+    ""LOW_RISK""
+  ]
+}",""" The invoice from BluePeak Office Co. (INV-8101) with a PO ID of PO1004, an amount of 3200.00, a match status of MATCH, and a final flag of OK appears to be safe, as it has a match status indicating that it aligns with the purchase order and the final flag confirming its approval."""
+I006,EuroMach Systems,INV-9902,PO1005,21000.00,AMOUNT_MISMATCH,OVERBILLING_RISK,"{
+  ""labels"": [
+    ""HIGH_RISK""
+  ]
+}",""" The invoice from EuroMach Systems (INV-9902) with a PO ID of PO1005 and an amount of 21000.00 is considered risky due to an AMOUNT_MISMATCH and an OVERBILLING_RISK flag, indicating potential procurement fraud."""
+I007,Vertex Logistics,INV-3307,PO1006,7600.00,MATCH,OK,"{
+  ""labels"": [
+    ""LOW_RISK""
+  ]
+}",""" The invoice is safe as it has a match status of \""MATCH,\"" indicating that it corresponds to a purchase order (PO1006) and the final flag is \""OK,\"" suggesting no issues have been found during the review process."""
+I008,Acme Supplies,INV-9015,PO1007,5400.00,MATCH,OK,"{
+  ""labels"": [
+    ""LOW_RISK""
+  ]
+}",""" The invoice is safe as it has a match status of \""MATCH,\"" indicating that it corresponds to a purchase order (PO1007) and the final flag is \""OK,\"" suggesting no issues have been found during the review process."""
+I009,Global Parts Ltd,INV-5501,PO1008,12500.00,MATCH,OK,"{
+  ""labels"": [
+    ""LOW_RISK""
+  ]
+}",""" The invoice is safe as it has a match status of \""MATCH,\"" indicating that the purchase order, invoice number, and vendor details align, and the final flag is marked as \""OK.\"""""
+I010,BluePeak Office Co,INV-8108,PO1009,8900.00,MATCH,OK,"{
+  ""labels"": [
+    ""LOW_RISK""
+  ]
+}",""" The invoice from BluePeak Office Co. (INV-8108) with a PO ID of PO1009, an amount of 8900.00, and a match status of MATCH and final flag of OK appears to be safe, as it has a match status indicating it aligns with the purchase order and a final flag suggesting it has been reviewed and approved."""
+I011,BluePeak Office Co,INV-8108,PO1009,8900.00,MATCH,DUPLICATE_INVOICE,"{
+  ""labels"": [
+    ""MEDIUM_RISK""
+  ]
+}",""" The invoice from BluePeak Office Co. (INV-8108) with a PO ID of PO1009 and an amount of 8900.00 is risky because it has been flagged as a duplicate invoice, indicating potential fraud or error."""
+I012,Vertex Logistics,INV-4301,PO1010,4300.00,MATCH,OK,"{
+  ""labels"": [
+    ""LOW_RISK""
+  ]
+}",""" The invoice is safe as it has a match status of \""MATCH,\"" indicating that it corresponds to a purchase order (PO1010) and the final flag is \""OK,\"" suggesting no issues have been found."""
+I013,Vertex Logistics,INV-4301,PO1010,4300.00,MATCH,DUPLICATE_INVOICE,"{
+  ""labels"": [
+    ""MEDIUM_RISK""
+  ]
+}",""" The invoice from Vertex Logistics (INV-4301) with a PO ID of PO1010 for $4,300 is risky because it has been flagged as a duplicate invoice, indicating potential fraud or error."""
